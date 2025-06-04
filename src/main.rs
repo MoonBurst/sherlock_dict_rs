@@ -66,25 +66,26 @@ impl DefinitionResponse {
 
         // Iterate through each meaning and format it
         for meaning in &self.meanings {
-            content_buffer.push_str(&format!("\n--- Part of Speech: {} ---\n", meaning.part_of_speech));
+            content_buffer.push_str(&format!("─── <i>{}</i> ───\n\n", meaning.part_of_speech));
             for (i, def) in meaning.definitions.iter().enumerate() {
                 content_buffer.push_str(&format!("  {}. {}\n", i + 1, def.definition));
                 if let Some(example) = &def.example {
-                    content_buffer.push_str(&format!("     Example: \"{}\"\n", example));
+                    content_buffer.push_str(&format!("\tExample: \"{}\"\n", example));
                 }
                 if let Some(synonyms) = &def.synonyms {
                     if !synonyms.is_empty() {
-                        content_buffer.push_str(&format!("     Synonyms: {}\n", synonyms.join(", ")));
+                        content_buffer.push_str(&format!("\tSynonyms: {}\n", synonyms.join(", ")));
                     }
                 }
                 if let Some(antonyms) = &def.antonyms {
                     if !antonyms.is_empty() {
-                        content_buffer.push_str(&format!("     Antonyms: {}\n", antonyms.join(", ")));
+                        content_buffer.push_str(&format!("\tAntonyms: {}\n", antonyms.join(", ")));
                     }
                 }
+                content_buffer.push_str("\n");
             }
         }
-        content_buffer.push_str("\n---\n"); 
+        content_buffer.push_str("────────────"); 
         content_buffer
     }
 }
@@ -131,9 +132,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                     // Create a single SherlockPipeResponse with all content
                     let sherlock_response = SherlockPipeResponse {
-                        title: format!("Definition of {}", word_to_define),
-                        content: all_definitions_content,
-                        next_content: String::new(), // Populate if Sherlock supports pagination
+                        title: format!(r#"Definition of "{}""#, word_to_define),
+                        content: all_definitions_content.clone(),
+                        next_content: all_definitions_content, // Populate if Sherlock supports pagination
                     };
                     println!("{}", serde_json::to_string(&sherlock_response).unwrap());
                 }
