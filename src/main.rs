@@ -1,6 +1,6 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::env;
+use std::{env, vec};
 use surf;
 use tokio;
 #[derive(Debug, Serialize, Deserialize)]
@@ -43,6 +43,22 @@ struct Definition {
     synonyms: Option<Vec<String>>,
     antonyms: Option<Vec<String>>,
 }
+impl Definition {
+    fn to_vec(&self)->Vec<String>{
+        let mut collect: Vec<String> = Vec::with_capacity(4);
+        collect.push(self.definition.to_string());
+        if let Some(example) = &self.example {
+            collect.push(example.to_string());
+        }
+        if let Some(synonyms) = &self.synonyms {
+            collect.push(synonyms.join(", "));
+        }
+        if let Some(antonyms) = &self.antonyms {
+            collect.push(antonyms.join(", "));
+        }
+        collect
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ApiErrorResponse {
@@ -70,11 +86,12 @@ pub struct ApplicationAction {
 impl ApplicationAction {
     fn from_definition(definition: &Definition) -> Self {
         let name = remove_parens(&definition.definition);
+        let short = definition.to_vec().join("\n");
         Self {
             name: Some(name),
-            exec: definition.example.clone(),
+            exec: Some(short),
             icon: Some(String::from("edit-copy")),
-            method: String::from("copy"),
+            method: String::from("print"),
             exit: true,
         }
     }
