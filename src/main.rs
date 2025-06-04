@@ -65,27 +65,31 @@ impl DefinitionResponse {
         let mut content_buffer = String::new();
 
         // Iterate through each meaning and format it
+        content_buffer.push_str("<span font_desc=\"monospace\">\n");
+
         for meaning in &self.meanings {
-            content_buffer.push_str(&format!("─── <i>{}</i> ───\n\n", meaning.part_of_speech));
+            content_buffer.push_str(&format!("─── <b><i>{}</i></b> ───\n\n", meaning.part_of_speech));
             for (i, def) in meaning.definitions.iter().enumerate() {
-                content_buffer.push_str(&format!("  {}. {}\n", i + 1, def.definition));
+                content_buffer.push_str(&format!(" {:>2}. {}\n", i + 1, def.definition));
                 if let Some(example) = &def.example {
-                    content_buffer.push_str(&format!("\tExample: \"{}\"\n", example));
+                    content_buffer.push_str(&format!("     Example: \"{}\"\n", example));
                 }
                 if let Some(synonyms) = &def.synonyms {
                     if !synonyms.is_empty() {
-                        content_buffer.push_str(&format!("\tSynonyms: {}\n", synonyms.join(", ")));
+                        content_buffer.push_str(&format!("     Synonyms: {}\n", synonyms.join(", ")));
                     }
                 }
                 if let Some(antonyms) = &def.antonyms {
                     if !antonyms.is_empty() {
-                        content_buffer.push_str(&format!("\tAntonyms: {}\n", antonyms.join(", ")));
+                        content_buffer.push_str(&format!("     Antonyms: {}\n", antonyms.join(", ")));
                     }
                 }
                 content_buffer.push_str("\n");
             }
         }
-        content_buffer.push_str("────────────"); 
+        content_buffer.push_str("────────────\n");
+        content_buffer.push_str("</span>");
+
         content_buffer
     }
 }
