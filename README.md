@@ -19,7 +19,7 @@ Apply the following to your sherlock's fallback.json and run it with "define $wo
     "async": true,
     "args": {
         "icon": "dictionary",
-        "exec": "/home/$USER/.config/sherlock/scripts/sherlock-dictionary",
+        "exec": ".config/sherlock/scripts/sherlock-dictionary",
         "exec-args": "{keyword}"
     },
     "priority": 0,
