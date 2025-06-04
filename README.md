@@ -6,7 +6,7 @@ Much like the https://github.com/Skxxtz/sherlock-wiki, this is meant to tap into
 git clone https://github.com/MoonBurst/sherlock_dict_rs.git
 cd sherlock_dict_rs
 cargo build --release
-Then place it into your .config/sherlock/scripts/
+mv target/release/sherlock-dictionary ~/.config/sherlock/scripts
 ```
 
 Apply the following to your sherlock's fallback.json and run it with "define $words"
