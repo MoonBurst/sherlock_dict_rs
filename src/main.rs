@@ -1,3 +1,4 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::env;
 use surf;
@@ -55,11 +56,38 @@ struct SherlockPipeResponse {
     title: String,
     content: String,
     next_content: String,
+    actions: Vec<ApplicationAction>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ApplicationAction {
+    name: Option<String>,
+    exec: Option<String>,
+    icon: Option<String>,
+    method: String,
+    exit: bool,
+}
+impl ApplicationAction {
+    fn from_definition(definition: &Definition) -> Self {
+        let name = remove_parens(&definition.definition);
+        Self {
+            name: Some(name),
+            exec: definition.example.clone(),
+            icon: Some(String::from("edit-copy")),
+            method: String::from("copy"),
+            exit: true,
+        }
+    }
+}
+fn remove_parens(s: &str) -> String {
+    let re = Regex::new(r"^\([^)]*\)\s*").unwrap();
+    re.replace(s, "").to_string()
 }
 
 impl DefinitionResponse {
-    fn format_content_for_sherlock(&self) -> String {
+    fn format_content_for_sherlock(&self) -> (String, Vec<ApplicationAction>) {
         let mut content_buffer = String::new();
+        let mut actions: Vec<ApplicationAction> = Vec::new();
 
         // Iterate through each meaning and format it
         content_buffer.push_str("<span font_desc=\"monospace\">\n");
@@ -70,6 +98,7 @@ impl DefinitionResponse {
                 meaning.part_of_speech
             ));
             for (i, def) in meaning.definitions.iter().enumerate() {
+                actions.push(ApplicationAction::from_definition(&def));
                 content_buffer.push_str(&format!(" {:>2}. {}\n", i + 1, def.definition));
                 if let Some(example) = &def.example {
                     content_buffer.push_str(&format!("     Example: \"{}\"\n", example));
@@ -92,7 +121,7 @@ impl DefinitionResponse {
         content_buffer.push_str("────────────\n");
         content_buffer.push_str("</span>");
 
-        content_buffer
+        (content_buffer, actions)
     }
 }
 
@@ -125,6 +154,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         title: "No definition found".to_string(),
                         content: String::new(), // Empty content for a concise message
                         next_content: String::new(),
+                        actions: vec![],
                     };
                     println!(
                         "{}",
@@ -132,10 +162,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     );
                 } else {
                     // Consolidate all definitions into a single content string
+                    let mut actions: Vec<ApplicationAction> = Vec::new();
                     let mut all_definitions_content = String::new();
                     for def_response in definitions {
-                        all_definitions_content
-                            .push_str(&def_response.format_content_for_sherlock());
+                        let (content, acts) = def_response.format_content_for_sherlock();
+                        all_definitions_content.push_str(&content);
+                        actions.extend(acts);
                     }
 
                     // Create a single SherlockPipeResponse with all content
@@ -143,6 +175,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         title: format!(r#"Definition of "{}""#, word_to_define),
                         content: all_definitions_content.clone(),
                         next_content: all_definitions_content, // Populate if Sherlock supports pagination
+                        actions,
                     };
                     println!("{}", serde_json::to_string(&sherlock_response).unwrap());
                 }
@@ -160,6 +193,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 title: "No definition found".to_string(),
                                 content: String::new(), // Empty content for a concise message
                                 next_content: String::new(),
+                                actions: vec![],
                             };
                             println!(
                                 "{}",
@@ -177,6 +211,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     api_error.message, api_error.resolution
                                 ),
                                 next_content: String::new(),
+                                actions: vec![],
                             };
                             println!(
                                 "{}",
@@ -198,6 +233,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 body_text
                             ),
                             next_content: String::new(),
+                            actions: vec![],
                         };
                         println!(
                             "{}",
@@ -219,6 +255,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         title: "No definition found".to_string(),
                         content: String::new(), // Empty content for a concise message
                         next_content: String::new(),
+                        actions: vec![],
                     };
                     println!(
                         "{}",
@@ -236,6 +273,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             api_error.message, api_error.resolution
                         ),
                         next_content: String::new(),
+                        actions: vec![],
                     };
                     println!(
                         "{}",
@@ -255,6 +293,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     title: format!("HTTP Error (Status {}) for '{}'", status, word_to_define),
                     content: format!("Failed to parse error response. Raw body: {}", body_text),
                     next_content: String::new(),
+                    actions: vec![],
                 };
                 println!(
                     "{}",
