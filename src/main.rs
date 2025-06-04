@@ -80,8 +80,14 @@ impl ApplicationAction {
     }
 }
 fn remove_parens(s: &str) -> String {
-    let re = Regex::new(r"^\([^)]*\)\s*").unwrap();
-    re.replace(s, "").to_string()
+    let re = Regex::new(r"\([^)]*\)\s*").unwrap();
+    let cleaned = re.replace_all(s, "");
+    cleaned
+        .split_once(',')
+        .map_or_else(
+            || cleaned.trim_end_matches('.').to_string(),
+            |(first, _)| first.trim_end_matches('.').to_string(),
+        )
 }
 
 impl DefinitionResponse {
