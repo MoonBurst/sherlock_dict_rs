@@ -1,0 +1,9 @@
+[package]
+name = "sherlock-dictionary"
+version = "0.1.0"
+edition = "2021"
+[dependencies]
+tokio = { version = "1", features = ["full"] } # For async main
+surf = "2.3" # For HTTP requests
+serde = { version = "1.0", features = ["derive"] } # For (de)serialization
+serde_json = "1.0" # For working with JSON values
