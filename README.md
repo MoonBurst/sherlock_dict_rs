@@ -23,3 +23,5 @@ Apply the following to your sherlock's fallback.json and run it with "define $wo
     "priority": 0,
     "shortcut": false
 	}
+
+Frankly, I'm not much of a programmer, this is my attempt to make something work though! There's PROBABLY a better way to do all of this.
