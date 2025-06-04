@@ -1,8 +1,7 @@
-
 use serde::{Deserialize, Serialize};
 use std::env;
 use surf;
-use tokio; 
+use tokio;
 #[derive(Debug, Serialize, Deserialize)]
 struct DefinitionResponse {
     word: String,
@@ -58,8 +57,6 @@ struct SherlockPipeResponse {
     next_content: String,
 }
 
-
-
 impl DefinitionResponse {
     fn format_content_for_sherlock(&self) -> String {
         let mut content_buffer = String::new();
@@ -68,7 +65,10 @@ impl DefinitionResponse {
         content_buffer.push_str("<span font_desc=\"monospace\">\n");
 
         for meaning in &self.meanings {
-            content_buffer.push_str(&format!("─── <b><i>{}</i></b> ───\n\n", meaning.part_of_speech));
+            content_buffer.push_str(&format!(
+                "─── <b><i>{}</i></b> ───\n\n",
+                meaning.part_of_speech
+            ));
             for (i, def) in meaning.definitions.iter().enumerate() {
                 content_buffer.push_str(&format!(" {:>2}. {}\n", i + 1, def.definition));
                 if let Some(example) = &def.example {
@@ -76,12 +76,14 @@ impl DefinitionResponse {
                 }
                 if let Some(synonyms) = &def.synonyms {
                     if !synonyms.is_empty() {
-                        content_buffer.push_str(&format!("     Synonyms: {}\n", synonyms.join(", ")));
+                        content_buffer
+                            .push_str(&format!("     Synonyms: {}\n", synonyms.join(", ")));
                     }
                 }
                 if let Some(antonyms) = &def.antonyms {
                     if !antonyms.is_empty() {
-                        content_buffer.push_str(&format!("     Antonyms: {}\n", antonyms.join(", ")));
+                        content_buffer
+                            .push_str(&format!("     Antonyms: {}\n", antonyms.join(", ")));
                     }
                 }
                 content_buffer.push_str("\n");
@@ -93,7 +95,6 @@ impl DefinitionResponse {
         content_buffer
     }
 }
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -110,9 +111,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     let mut response = surf::get(&definition_url).await?;
-    let status = response.status(); 
-    let body_text = response.body_string().await?; 
-
+    let status = response.status();
+    let body_text = response.body_string().await?;
 
     if status.is_success() {
         // Attempt to parse the response as a vector of DefinitionResponse (successful case).
@@ -126,12 +126,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         content: String::new(), // Empty content for a concise message
                         next_content: String::new(),
                     };
-                    println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                    println!(
+                        "{}",
+                        serde_json::to_string(&sherlock_error_response).unwrap()
+                    );
                 } else {
                     // Consolidate all definitions into a single content string
                     let mut all_definitions_content = String::new();
                     for def_response in definitions {
-                        all_definitions_content.push_str(&def_response.format_content_for_sherlock());
+                        all_definitions_content
+                            .push_str(&def_response.format_content_for_sherlock());
                     }
 
                     // Create a single SherlockPipeResponse with all content
@@ -157,7 +161,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                                 content: String::new(), // Empty content for a concise message
                                 next_content: String::new(),
                             };
-                            println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                            println!(
+                                "{}",
+                                serde_json::to_string(&sherlock_error_response).unwrap()
+                            );
                         } else {
                             // For other API errors, output the detailed message
                             eprintln!("API Error: {}", api_error.title);
@@ -165,10 +172,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             eprintln!("Resolution: {}", api_error.resolution);
                             let sherlock_error_response = SherlockPipeResponse {
                                 title: format!("API Error: {}", api_error.title),
-                                content: format!("Message: {}\nResolution: {}", api_error.message, api_error.resolution),
+                                content: format!(
+                                    "Message: {}\nResolution: {}",
+                                    api_error.message, api_error.resolution
+                                ),
                                 next_content: String::new(),
                             };
-                            println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                            println!(
+                                "{}",
+                                serde_json::to_string(&sherlock_error_response).unwrap()
+                            );
                         }
                     }
                     Err(_) => {
@@ -180,10 +193,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         // Output generic parsing error as JSON for Sherlock
                         let sherlock_error_response = SherlockPipeResponse {
                             title: format!("Parsing Error for '{}'", word_to_define),
-                            content: format!("Failed to parse API response. Raw body: {}", body_text),
+                            content: format!(
+                                "Failed to parse API response. Raw body: {}",
+                                body_text
+                            ),
                             next_content: String::new(),
                         };
-                        println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                        println!(
+                            "{}",
+                            serde_json::to_string(&sherlock_error_response).unwrap()
+                        );
                     }
                 }
             }
@@ -201,7 +220,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         content: String::new(), // Empty content for a concise message
                         next_content: String::new(),
                     };
-                    println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                    println!(
+                        "{}",
+                        serde_json::to_string(&sherlock_error_response).unwrap()
+                    );
                 } else {
                     // For other API errors, output the detailed message
                     eprintln!("API Error (Status {}): {}", status, api_error.title);
@@ -209,10 +231,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     eprintln!("Resolution: {}", api_error.resolution);
                     let sherlock_error_response = SherlockPipeResponse {
                         title: format!("API Error (Status {}): {}", status, api_error.title),
-                        content: format!("Message: {}\nResolution: {}", api_error.message, api_error.resolution),
+                        content: format!(
+                            "Message: {}\nResolution: {}",
+                            api_error.message, api_error.resolution
+                        ),
                         next_content: String::new(),
                     };
-                    println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                    println!(
+                        "{}",
+                        serde_json::to_string(&sherlock_error_response).unwrap()
+                    );
                 }
             }
             Err(e) => {
@@ -228,7 +256,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     content: format!("Failed to parse error response. Raw body: {}", body_text),
                     next_content: String::new(),
                 };
-                println!("{}", serde_json::to_string(&sherlock_error_response).unwrap());
+                println!(
+                    "{}",
+                    serde_json::to_string(&sherlock_error_response).unwrap()
+                );
             }
         }
     }
