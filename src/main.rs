@@ -85,9 +85,10 @@ fn remove_parens(s: &str) -> String {
     cleaned
         .split_once(',')
         .map_or_else(
-            || cleaned.trim_end_matches('.').to_string(),
-            |(first, _)| first.trim_end_matches('.').to_string(),
+            || cleaned.trim_end_matches('.'),
+            |(first, _)| first.trim_end_matches('.'),
         )
+        .to_string()
 }
 
 impl DefinitionResponse {
