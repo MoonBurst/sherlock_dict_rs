@@ -4,7 +4,7 @@
   <picture>
     <img alt="application screenshot" width="100%" style="border-radius: 10px;" src="assets/screenshot.png">
   </picture>
-  <p align="center"><i>Application screenshot showing an example.</i></p>
+  <p align="center" style="color:gray; font-size:0.85em;"><i>Application screenshot showing an example.</i></p>
 </div>
 
 Much like [sherlock wiki](https://github.com/Skxxtz/sherlock-wiki), this is meant to tap into dict.org
