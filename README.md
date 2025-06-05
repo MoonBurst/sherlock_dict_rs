@@ -1,5 +1,11 @@
 # Sherlock Dict
 
+<div align="center" style="text-align:center; border-radius:10px;">
+  <picture>
+    <img alt="application screenshot" width="100%" style="border-radius: 10px;" src="assets/screenshot.png">
+  </picture>
+</div>
+
 Here's hoping this works!
 <br>
 Much like [sherlock wiki](https://github.com/Skxxtz/sherlock-wiki), this is meant to tap into dict.org
