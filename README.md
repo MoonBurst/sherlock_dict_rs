@@ -6,8 +6,6 @@
   </picture>
 </div>
 
-Here's hoping this works!
-<br>
 Much like [sherlock wiki](https://github.com/Skxxtz/sherlock-wiki), this is meant to tap into dict.org
 
 ## Installation
