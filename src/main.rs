@@ -91,7 +91,7 @@ impl ApplicationAction {
             name: Some(name),
             exec: Some(short),
             icon: Some(String::from("edit-copy")),
-            method: String::from("print"),
+            method: String::from("copy"),
             exit: true,
         }
     }
